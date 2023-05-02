@@ -26,13 +26,16 @@ const uint8_t IN_2 = D8;
 const uint8_t IN_3= D3;
 const uint8_t IN_4 = D4;
 const uint8_t EN_B = D6;
-
+const uint8_t echo=D1;
+const uint8_t trig=D0;
+long duration;
+float distance;
 #ifndef ACCESS_POINT_SSID
 ESP8266WiFiMulti wifi;
 #endif
 
 // ROS serial server
-IPAddress server(192,168,110,114);
+IPAddress server(192,168,2,75);
 ros::NodeHandle node;
 ros::Subscriber<geometry_msgs::Twist> sub("/cmd_vel", &onTwist);
 //ros::Subscriber<std_msgs::UInt8> sub2("/servo", &servo_cb);
@@ -47,6 +50,8 @@ void setup()
   pinMode(IN_2,OUTPUT);
   pinMode(IN_3,OUTPUT);
   pinMode(IN_4,OUTPUT);
+  pinMode(echo,INPUT);
+  pinMode(trig,OUTPUT);
   delay(2000);
   Serial.begin(9600);
   Serial.println();
@@ -120,7 +125,26 @@ void onTwist(const geometry_msgs::Twist &msg)
   analogWrite(EN_B,255);
   float straight=msg.linear.x;
   float turn=msg.angular.z; 
-  if(straight>0.0)
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trig, LOW);
+  delayMicroseconds(10);
+  digitalWrite(trig, HIGH);
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echo, HIGH);
+  // Calculating the distance
+  distance = duration * 0.034 / 2;
+  Serial.println(distance);
+  if(distance<=5.0)
+  {
+    digitalWrite(IN_3,0);
+    digitalWrite(IN_4,0);
+    digitalWrite(IN_1,0);
+    digitalWrite(IN_2,0);
+    }
+
+else if(straight>0.0)
   {
     //(in3=1 && in4=0 && in1=0 && in2=1)
 //    IN_3=1;

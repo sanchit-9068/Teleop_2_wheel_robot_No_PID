@@ -69,8 +69,8 @@ void stop()
   digitalWrite(IN_2,0);
   digitalWrite(IN_3,0);
   digitalWrite(IN_4,0);
-  analogWrite(EN_A,0);
-  analogWrite(EN_B,0);
+//  analogWrite(EN_A,0);
+//  analogWrite(EN_B,0);
 }
 
 void setupWiFi()
@@ -113,6 +113,21 @@ void setupWiFi()
 #endif
 }
 
+void left()
+{
+  
+}
+void right()
+{
+  
+}
+void back()
+{
+    digitalWrite(IN_3,0);
+    digitalWrite(IN_4,1);
+    digitalWrite(IN_1,1);
+    digitalWrite(IN_2,0);
+}
 
 void onTwist(const geometry_msgs::Twist &msg)
 {
@@ -125,32 +140,16 @@ void onTwist(const geometry_msgs::Twist &msg)
   analogWrite(EN_B,255);
   float straight=msg.linear.x;
   float turn=msg.angular.z; 
-  digitalWrite(trig, HIGH);
-  delayMicroseconds(2);
-  // Sets the trigPin on HIGH state for 10 micro seconds
-  digitalWrite(trig, LOW);
-  delayMicroseconds(10);
-  digitalWrite(trig, HIGH);
-  // Reads the echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(echo, HIGH);
-  // Calculating the distance
-  distance = duration * 0.034 / 2;
-  Serial.println(distance);
-  if(distance<=5.0)
-  {
-    digitalWrite(IN_3,0);
-    digitalWrite(IN_4,0);
-    digitalWrite(IN_1,0);
-    digitalWrite(IN_2,0);
-    }
+ 
 
-else if(straight>0.0)
+if(straight>0.0)
   {
     //(in3=1 && in4=0 && in1=0 && in2=1)
 //    IN_3=1;
 //    IN_4=0;
 //    IN_1=0;
 //    IN_2=1;
+ 
     digitalWrite(IN_3,1);
     digitalWrite(IN_4,0);
     digitalWrite(IN_1,0);
@@ -162,6 +161,7 @@ else if(straight>0.0)
 //    IN_4=1;
 //    IN_1=1;
 //    IN_2=0;
+  
     digitalWrite(IN_3,0);
     digitalWrite(IN_4,1);
     digitalWrite(IN_1,1);
@@ -174,6 +174,7 @@ else if(straight>0.0)
 //    IN_4=0;
 //    IN_1=1;
 //    IN_2=0;
+  
     digitalWrite(IN_3,1);
     digitalWrite(IN_4,0);
     digitalWrite(IN_1,1);
@@ -186,6 +187,7 @@ else if(straight>0.0)
 //    IN_4=1;
 //    IN_1=0;
 //    IN_2=1;
+  
     digitalWrite(IN_3,0);
     digitalWrite(IN_4,1);
     digitalWrite(IN_1,0);
@@ -197,6 +199,7 @@ else if(straight>0.0)
 //    IN_4=0;
 //    IN_1=0;
 //    IN_2=0;
+  
     digitalWrite(IN_3,0);
     digitalWrite(IN_4,0);
     digitalWrite(IN_1,0);
@@ -208,6 +211,23 @@ else if(straight>0.0)
 
 void loop() {
   // put your main code here, to run repeatedly:
+   digitalWrite(trig, HIGH);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trig, LOW);
+  delayMicroseconds(10);
+  digitalWrite(trig, HIGH);
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echo, HIGH);
+  // Calculating the distance
+  distance = duration * 0.034 / 2;
+  Serial.println(distance);
+  if(distance<=7.0&&distance!=0.0)
+  {
+     Serial.println("stopping");
+  stop();
+  back();
+    }
   if (!rosConnected())
     stop();
   node.spinOnce();
